@@ -1,0 +1,61 @@
+{
+  "missions": [
+    {
+      "id": 1714000001000,
+      "savedAt": "2024-04-25T10:00:01.000Z",
+      "operator": "operator",
+      "missionTime": "03:42",
+      "battery": 45.2,
+      "damage": 28,
+      "encounters": 4,
+      "escapes": 4,
+      "hits": 2,
+      "safePercent": "72%",
+      "blacklistedFreqs": ["5.8 GHz", "900 MHz"],
+      "terminationReason": "Battery depleted",
+      "notes": "Drone successfully escaped all jammers. Two projectile hits received."
+    },
+    {
+      "id": 1714000002000,
+      "savedAt": "2024-04-25T11:30:00.000Z",
+      "operator": "admin",
+      "missionTime": "01:15",
+      "battery": 89.1,
+      "damage": 85,
+      "encounters": 3,
+      "escapes": 2,
+      "hits": 6,
+      "safePercent": "48%",
+      "blacklistedFreqs": ["5.8 GHz"],
+      "terminationReason": "Self-destruct — critical damage 85%",
+      "notes": "Self-destruct triggered after 6 projectile hits. AI escape algorithm partially effective."
+    },
+    {
+      "id": 1714000003000,
+      "savedAt": "2024-04-26T09:15:00.000Z",
+      "operator": "operator",
+      "missionTime": "07:58",
+      "battery": 12.3,
+      "damage": 0,
+      "encounters": 6,
+      "escapes": 6,
+      "hits": 0,
+      "safePercent": "91%",
+      "blacklistedFreqs": ["5.8 GHz", "900 MHz", "2.4 GHz"],
+      "terminationReason": "RTH — battery critical",
+      "notes": "Perfect mission — zero hits, all 6 jammers escaped and blacklisted."
+    }
+  ],
+  "rfZoneDatabase": [
+    { "id": 1, "frequency": 900,  "band": "ISM 900 MHz", "standard": "LoRa / LPWAN",     "snrThreshold": 5, "riskLevel": "HIGH",   "notes": "Long-range jamming, hard to escape" },
+    { "id": 2, "frequency": 2400, "band": "ISM 2.4 GHz", "standard": "IEEE 802.11 b/g/n","snrThreshold": 8, "riskLevel": "MEDIUM", "notes": "Wi-Fi / Bluetooth overlap band" },
+    { "id": 3, "frequency": 5800, "band": "ISM 5.8 GHz", "standard": "IEEE 802.11 a/ac", "snrThreshold": 5, "riskLevel": "HIGH",   "notes": "FPV / DJI drone video link" }
+  ],
+  "securityEvents": [
+    { "ts": "2024-04-25T10:00:00.000Z", "type": "AUTH",    "msg": "operator authenticated successfully" },
+    { "ts": "2024-04-25T10:00:05.000Z", "type": "ENCRYPT", "msg": "AES-256-GCM link established" },
+    { "ts": "2024-04-25T10:05:00.000Z", "type": "IDS",     "msg": "Jamming threat detected — 5.8 GHz" },
+    { "ts": "2024-04-25T10:05:08.000Z", "type": "ESCAPE",  "msg": "Radial escape executed successfully" },
+    { "ts": "2024-04-25T10:43:42.000Z", "type": "AUTH",    "msg": "Session expired — auto-logout" }
+  ]
+}
