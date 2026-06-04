@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AEGIS-7 · AI Surveillance Drone — Full Stack</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ══ LOGIN SCREEN ══════════════════════════════════════════════ -->
+<div id="login-screen">
+  <div id="login-box">
+    <div class="login-logo">⬡</div>
+    <div class="login-title">AEGIS-7</div>
+    <div class="login-sub">SECURE OPERATOR ACCESS</div>
+    <div id="login-error" class="login-error" style="display:none"></div>
+    <div class="login-field">
+      <label>OPERATOR ID</label>
+      <input type="text" id="login-user" placeholder="Enter operator ID" autocomplete="off">
+    </div>
+    <div class="login-field">
+      <label>ACCESS KEY</label>
+      <input type="password" id="login-pass" placeholder="Enter access key">
+    </div>
+    <button id="login-btn" onclick="doLogin()">AUTHENTICATE</button>
+    <div class="login-hint">Demo: operator / aegis2024</div>
+  </div>
+</div>
+
+<!-- ══ MAIN SIMULATION (hidden until login) ══════════════════════ -->
+<div id="app" style="display:none; flex-direction:column; height:100vh;">
+
+<!-- HEADER -->
+<div id="header">
+  <div class="hdr-brand">
+    <div class="hdr-logo">⬡</div>
+    <div>
+      <div class="hdr-title">AEGIS-7</div>
+      <div class="hdr-sub">AI-DRIVEN SURVEILLANCE · JAMMING RESILIENCE · SELF-DESTRUCT PROTOCOL</div>
+    </div>
+  </div>
+  <div class="hdr-center">
+    <div class="hdr-stat"><span class="hdr-val" id="h-timer">00:00</span><span class="hdr-lbl">MISSION TIME</span></div>
+    <div class="hdr-sep"></div>
+    <div class="hdr-stat"><span class="hdr-val" id="h-battery" style="color:#10b981">100%</span><span class="hdr-lbl">BATTERY</span></div>
+    <div class="hdr-sep"></div>
+    <div class="hdr-stat"><span class="hdr-val" id="h-damage" style="color:#10b981">0%</span><span class="hdr-lbl">DAMAGE</span></div>
+    <div class="hdr-sep"></div>
+    <div class="hdr-stat"><span class="hdr-val" id="h-threat" style="color:#10b981;font-size:11px">CLEAR</span><span class="hdr-lbl">THREAT</span></div>
+    <div class="hdr-sep"></div>
+    <div class="hdr-stat"><span class="hdr-val" id="h-encryption" style="color:#10b981;font-size:10px">AES-256</span><span class="hdr-lbl">LINK ENC</span></div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-opname" id="hdr-opname">OPERATOR</div>
+    <div class="status-pill" id="status-pill"><span class="pill-dot"></span><span id="status-text">SURVEILLANCE</span></div>
+    <button class="btn-logout" onclick="doLogout()">LOGOUT</button>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div id="main">
+
+  <!-- LEFT PANEL -->
+  <div id="panel-left">
+    <div class="panel-scroll">
+
+      <!-- SECURITY STATUS — NEW -->
+      <div class="sb-sec">
+        <div class="sec-hdr">🔐 Security Status</div>
+        <div class="sec-line"></div>
+        <div class="sec-row"><span class="sec-lbl">Encryption</span><span class="sec-val green" id="sec-enc">AES-256-GCM</span></div>
+        <div class="sec-row"><span class="sec-lbl">Auth Token</span><span class="sec-val green" id="sec-token">VALID</span></div>
+        <div class="sec-row"><span class="sec-lbl">Session</span><span class="sec-val" id="sec-session">—</span></div>
+        <div class="sec-row"><span class="sec-lbl">Intrusion</span><span class="sec-val green" id="sec-ids">NONE DETECTED</span></div>
+        <div class="sec-row"><span class="sec-lbl">Data Link</span><span class="sec-val green" id="sec-link">SECURE</span></div>
+        <div class="sec-row"><span class="sec-lbl">Cmd Auth</span><span class="sec-val green" id="sec-cmd">VERIFIED</span></div>
+        <div class="threat-progress-wrap" style="margin-top:8px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+            <span class="sec-lbl">Security Score</span>
+            <span class="sec-val green" id="sec-score">98%</span>
+          </div>
+          <div class="prog-track"><div class="prog-fill green-fill" id="sec-score-bar" style="width:98%"></div></div>
+        </div>
+      </div>
+
+      <!-- DRONE TELEMETRY -->
+      <div class="sb-sec">
+        <div class="sec-hdr">📡 Drone Telemetry</div>
+        <div class="sec-line"></div>
+        <div class="sec-row"><span class="sec-lbl">Position</span><span class="sec-val" id="sb-pos">—</span></div>
+        <div class="sec-row"><span class="sec-lbl">Speed</span><span class="sec-val" id="sb-spd">—</span></div>
+        <div class="sec-row"><span class="sec-lbl">Heading</span><span class="sec-val" id="sb-hdg">—</span></div>
+        <div class="sec-row"><span class="sec-lbl">Altitude</span><span class="sec-val">45m AGL</span></div>
+        <div class="sec-row"><span class="sec-lbl">Waypoint</span><span class="sec-val" id="sb-wp">—</span></div>
+      </div>
+
+      <!-- POWER SYSTEM -->
+      <div class="sb-sec">
+        <div class="sec-hdr">⚡ Power System</div>
+        <div class="sec-line"></div>
+        <div class="threat-progress-wrap">
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+            <span class="sec-lbl">Battery</span><span class="sec-val green" id="batt-val-lbl">100%</span>
+          </div>
+          <div class="prog-track"><div class="prog-fill green-fill" id="batt-fill" style="width:100%"></div></div>
+        </div>
+        <div class="threat-progress-wrap" style="margin-top:6px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+            <span class="sec-lbl">Hull Damage</span><span class="sec-val green" id="dmg-val-lbl">0%</span>
+          </div>
+          <div class="prog-track"><div class="prog-fill red-fill" id="dmg-fill" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <!-- RF ENVIRONMENT -->
+      <div class="sb-sec">
+        <div class="sec-hdr">📶 RF Environment</div>
+        <div class="sec-line"></div>
+        <div class="rf-freq-big" id="rf-freq">NO SIGNAL</div>
+        <div class="sec-row"><span class="sec-lbl">Band</span><span class="sec-val" id="rf-band">—</span></div>
+        <div class="sec-row"><span class="sec-lbl">RSSI</span><span class="sec-val" id="rf-rssi">—</span></div>
+        <div class="sec-row"><span class="sec-lbl">SNR</span><span class="sec-val" id="rf-snr">—</span></div>
+        <div class="sec-row"><span class="sec-lbl">Threat</span><span class="sec-val green" id="rf-threat">NONE</span></div>
+        <div style="margin-top:8px;">
+          <div class="sec-lbl" style="margin-bottom:4px;">Threat Intensity</div>
+          <div class="threat-segs">
+            <div class="tseg" id="ts0"></div><div class="tseg" id="ts1"></div>
+            <div class="tseg" id="ts2"></div><div class="tseg" id="ts3"></div>
+            <div class="tseg" id="ts4"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI DECISION ENGINE -->
+      <div class="sb-sec">
+        <div class="sec-hdr">🧠 AI Decision Engine</div>
+        <div class="sec-line"></div>
+        <div class="sec-row"><span class="sec-lbl">Confidence</span><span class="sec-val green" id="ai-conf">98%</span></div>
+        <div class="ai-bar-wrap">
+          <div class="ai-bar-track">
+            <div class="ai-bar-fill" id="ai-bar" style="width:98%"></div>
+          </div>
+        </div>
+        <div class="sec-row" style="margin-top:6px;"><span class="sec-lbl">Mode</span><span class="sec-val cyan" id="ai-mode">PATROL</span></div>
+        <div class="sec-row"><span class="sec-lbl">Algorithm</span><span class="sec-val" style="font-size:9px">Radial Escape + DRL</span></div>
+        <div class="sec-row"><span class="sec-lbl">Learning</span><span class="sec-val green">ONLINE</span></div>
+      </div>
+
+      <!-- BLACKLISTED RF -->
+      <div class="sb-sec">
+        <div class="sec-hdr">🔒 Blacklisted RF</div>
+        <div class="sec-line"></div>
+        <div id="blacklist-container"><div class="sec-lbl" style="font-size:9px;padding:4px 0">No frequencies blocked yet</div></div>
+      </div>
+
+      <!-- MISSION METRICS -->
+      <div class="sb-sec">
+        <div class="sec-hdr">📊 Mission Metrics</div>
+        <div class="sec-line"></div>
+        <div class="metrics-grid">
+          <div class="metric-tile"><div class="metric-num red" id="m-enc">0</div><div class="metric-lbl">Encounters</div></div>
+          <div class="metric-tile"><div class="metric-num green" id="m-esc">0</div><div class="metric-lbl">Escapes</div></div>
+          <div class="metric-tile"><div class="metric-num orange" id="m-hits">0</div><div class="metric-lbl">Hits</div></div>
+          <div class="metric-tile"><div class="metric-num cyan" id="m-safe">—</div><div class="metric-lbl">Safe%</div></div>
+        </div>
+      </div>
+
+      <!-- SECURITY LOG (NEW) -->
+      <div class="sb-sec">
+        <div class="sec-hdr">🛡️ Security Events</div>
+        <div class="sec-line"></div>
+        <div id="sec-log-list" style="max-height:120px;overflow-y:auto;"></div>
+      </div>
+
+      <!-- DATASET -->
+      <div class="sb-sec">
+        <div class="sec-hdr">📁 Dataset Info</div>
+        <div class="sec-line"></div>
+        <div class="sec-row"><span class="sec-lbl">RF Model</span><span class="sec-val" style="font-size:9px">RSSI Path-Loss</span></div>
+        <div class="sec-row"><span class="sec-lbl">900 MHz</span><span class="sec-val" style="font-size:9px">LoRa / ISM</span></div>
+        <div class="sec-row"><span class="sec-lbl">2.4 GHz</span><span class="sec-val" style="font-size:9px">Wi-Fi / BT</span></div>
+        <div class="sec-row"><span class="sec-lbl">5.8 GHz</span><span class="sec-val" style="font-size:9px">FPV / DJI</span></div>
+        <div class="sec-row"><span class="sec-lbl">Standard</span><span class="sec-val" style="font-size:9px">IEEE 802.11</span></div>
+        <div class="sec-row"><span class="sec-lbl">Auth</span><span class="sec-val" style="font-size:9px">JWT + AES-256</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CENTER CANVAS -->
+  <div id="canvas-area">
+    <div id="canvas-wrap">
+      <canvas id="sim"></canvas>
+      <div class="c-corner c-tl"></div><div class="c-corner c-tr"></div>
+      <div class="c-corner c-bl"></div><div class="c-corner c-br"></div>
+      <div id="coord-bar">X: — · Y: — · ALT: 45m · HDG: —</div>
+      <div id="alert-overlay"></div>
+
+      <!-- SELF DESTRUCT OVERLAY -->
+      <div id="sd-overlay">
+        <div class="sd-title">⚠ SELF-DESTRUCT INITIATED ⚠</div>
+        <div class="sd-ring"><div class="sd-inner"><div class="sd-count" id="sd-count">5</div><div class="sd-lbl">SEC</div></div></div>
+        <div class="sd-reason" id="sd-reason">CRITICAL DAMAGE</div>
+        <button class="btn-sd-abort" onclick="abortSD()">ABORT</button>
+      </div>
+
+      <!-- CRASH OVERLAY -->
+      <div id="crash-overlay">
+        <div class="crash-icon">💥</div>
+        <div class="crash-title">DRONE OFFLINE</div>
+        <div class="crash-sub" id="crash-sub">Mission Terminated</div>
+        <div class="crash-reason" id="crash-reason"></div>
+        <button class="btn-restart" onclick="document.getElementById('btn-reset').click()">REINITIALIZE</button>
+      </div>
+    </div>
+
+    <!-- EVENT LOG -->
+    <div id="log-area">
+      <div class="log-hdr"><span class="log-hdr-txt">⬥ REAL-TIME EVENT LOG</span><div class="live-dot"></div></div>
+      <div id="log-list"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="panel-right">
+    <div class="ctrl-lbl">Flight Mode</div>
+    <button class="ctrl-btn cyan-btn active" id="btn-auto">◈ AUTO PATROL</button>
+    <button class="ctrl-btn violet-btn" id="btn-manual">◎ MANUAL CTRL</button>
+
+    <div class="ctrl-sep"></div>
+    <div class="ctrl-lbl">Security Actions</div>
+    <button class="ctrl-btn orange-btn" id="btn-fire">⦿ FIRE PROJECTILE</button>
+    <button class="ctrl-btn magenta-btn" id="btn-sd">☢ SELF-DESTRUCT</button>
+    <button class="ctrl-btn teal-btn" id="btn-encrypt">🔐 RE-ENCRYPT LINK</button>
+    <button class="ctrl-btn yellow-btn" id="btn-ids">🛡 RUN IDS SCAN</button>
+
+    <div class="ctrl-sep"></div>
+    <div class="ctrl-lbl">Simulation</div>
+    <button class="ctrl-btn slate-btn" id="btn-pause">⏸ PAUSE</button>
+    <button class="ctrl-btn red-btn" id="btn-reset">↺ RESET</button>
+    <button class="ctrl-btn slate-btn" id="btn-export">💾 EXPORT LOG</button>
+
+    <div class="ctrl-sep"></div>
+    <div class="ctrl-lbl">Speed</div>
+    <div class="slider-wrap">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+        <span class="sec-lbl">Multiplier</span><span class="sec-val cyan" id="spd-lbl">1.0×</span>
+      </div>
+      <input type="range" id="spd-slider" min="1" max="30" value="10" step="1">
+    </div>
+
+    <div class="ctrl-sep"></div>
+    <div class="ctrl-lbl">Security Config</div>
+    <div class="sec-config-panel">
+      <div class="sc-row">
+        <span class="sec-lbl">IDS Active</span>
+        <div class="toggle-wrap"><input type="checkbox" id="tog-ids" checked><label for="tog-ids"></label></div>
+      </div>
+      <div class="sc-row">
+        <span class="sec-lbl">Auto-Encrypt</span>
+        <div class="toggle-wrap"><input type="checkbox" id="tog-enc" checked><label for="tog-enc"></label></div>
+      </div>
+      <div class="sc-row">
+        <span class="sec-lbl">Cmd Verify</span>
+        <div class="toggle-wrap"><input type="checkbox" id="tog-cmd" checked><label for="tog-cmd"></label></div>
+      </div>
+    </div>
+
+    <div class="ctrl-sep"></div>
+    <div class="ctrl-lbl">Zone Legend</div>
+    <div class="legend-item"><div class="leg-dot" style="background:rgba(16,185,129,0.3);border-color:#10b981"></div><span>Safe / Home</span></div>
+    <div class="legend-item"><div class="leg-dot" style="background:rgba(251,191,36,0.3);border-color:#fbbf24"></div><span>Caution 2.4GHz</span></div>
+    <div class="legend-item"><div class="leg-dot" style="background:rgba(239,68,68,0.3);border-color:#ef4444"></div><span>Jammer Zone</span></div>
+    <div class="legend-item"><div class="leg-dot" style="background:rgba(255,0,153,0.3);border-color:#ff0099;border-radius:2px"></div><span>Self-Destruct</span></div>
+
+    <div id="manual-hint" style="display:none;">
+      <div class="hint-box">CLICK MAP TO SET WAYPOINT</div>
+    </div>
+  </div>
+
+</div><!-- #main -->
+</div><!-- #app -->
+
+<script src="simulation.js"></script>
+</body>
+</html>
